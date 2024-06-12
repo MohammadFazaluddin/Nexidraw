@@ -5,11 +5,17 @@ import { useDraw } from "./lib/useDraw";
 export default function Home() {
 
     const [color, setColor] = useState<string>('#000');
+    const [eraser, setClear] = useState<boolean>(false);
+    const [eraserSize, setEraserSize] = useState<number>(40);
 
-    const { canvasRef, onMouseDown, clear } = useDraw(drawLine);
+
+    const { canvasRef, onMouseDown, clear } = useDraw(drawLine, setClearDraw);
     const canvasWidth = window.innerWidth;
-    const cavasHeight = window.innerHeight;
+    const canvasHeight = window.innerHeight;
 
+    function setClearDraw(): Eraser {
+        return { isOn: eraser, size: eraserSize };
+    }
 
     function drawLine({ prevPoint, current, ctx }: Draw) {
         const { x: currX, y: currY } = current;
@@ -36,10 +42,26 @@ export default function Home() {
 
     return (
         <div>
+            <div className="absolute top-10 left-1/3  bg-gray-300 flex">
+                <button
+                    className="px-10"
+                    onClick={() => setClear(true)} >
+                    Erase</button>
+                <button
+                    className="px-10"
+                    onClick={() => setClear(false)} >
+                    Pencile</button>
+            </div>
+
+            <div className="absolute w-40 left-0 bg-gray-300 flex">
+                <label>Eraser size</label>
+                <input type="number" onChange={(e) => setEraserSize(parseInt(e.target.value))} />
+            </div>
+
             <canvas className="bg-white"
                 ref={canvasRef}
                 onMouseDown={onMouseDown}
-                height={canvasWidth}
+                height={canvasHeight}
                 width={canvasWidth}
             />
         </div>

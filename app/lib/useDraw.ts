@@ -1,7 +1,8 @@
-import { info } from "console";
 import { useEffect, useRef, useState } from "react";
+import { isSet } from "util/types";
 
-export const useDraw = (onDraw: ({ctx, current, prevPoint}: Draw) => void) => {
+export const useDraw = (onDraw: ({ ctx, current, prevPoint }: Draw) => void,
+    isSetClear: () => Eraser) => {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -11,7 +12,7 @@ export const useDraw = (onDraw: ({ctx, current, prevPoint}: Draw) => void) => {
 
     const onMouseDown = () => setMouseDown(true)
 
-    const clear = () => {
+    const clear = (point: Point, size: number) => {
         const canvas = canvasRef.current;
 
         if (!canvas) return
@@ -19,7 +20,7 @@ export const useDraw = (onDraw: ({ctx, current, prevPoint}: Draw) => void) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(point.x, point.y, size, size);
     }
 
     useEffect(() => {
@@ -45,7 +46,11 @@ export const useDraw = (onDraw: ({ctx, current, prevPoint}: Draw) => void) => {
 
             if (!ctx || !currentPoint) return;
 
-            onDraw({ ctx, current: currentPoint, prevPoint: prevPoint.current });
+            const eraser = isSetClear();
+            if (eraser.isOn)
+                clear(currentPoint, eraser.size);
+            else
+                onDraw({ ctx, current: currentPoint, prevPoint: prevPoint.current });
             prevPoint.current = currentPoint;
         }
 
