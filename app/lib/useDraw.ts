@@ -14,13 +14,14 @@ export const useDraw = (onDraw: ({ ctx, current, prevPoint }: Draw) => void,
 
     const clear = (point: Point, size: number) => {
         const canvas = canvasRef.current;
+        let pos = size / 2;
 
         if (!canvas) return
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return
 
-        ctx.clearRect(point.x, point.y, size, size);
+        ctx.clearRect(point.x - pos, point.y - pos, size , size);
     }
 
     useEffect(() => {

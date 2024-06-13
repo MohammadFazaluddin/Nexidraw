@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDraw } from "./lib/useDraw";
 
 export default function Home() {
@@ -7,11 +7,16 @@ export default function Home() {
     const [color, setColor] = useState<string>('#000');
     const [eraser, setClear] = useState<boolean>(false);
     const [eraserSize, setEraserSize] = useState<number>(40);
+    const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
 
     const { canvasRef, onMouseDown, clear } = useDraw(drawLine, setClearDraw);
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight;
+    useEffect(() => {
+        setWindowSize({
+            width: window.innerWidth,
+            height: window.innerHeight,
+        })
+    }, []);
 
     function setClearDraw(): Eraser {
         return { isOn: eraser, size: eraserSize };
@@ -29,7 +34,6 @@ export default function Home() {
         ctx.strokeStyle = lineColor;
         ctx.moveTo(startPoint.x, startPoint.y);
         ctx.lineTo(currX, currY);
-        console.log(currX, currY);
 
         ctx.stroke();
 
@@ -53,16 +57,21 @@ export default function Home() {
                     Pencile</button>
             </div>
 
-            <div className="absolute w-40 left-0 bg-gray-300 flex">
-                <label>Eraser size</label>
-                <input type="number" onChange={(e) => setEraserSize(parseInt(e.target.value))} />
+            <div>
+                <label> Eraser Size </label>
+                <input 
+                    className="bg-gray-200 rounded text-black px-2"
+                    type="number"
+                    onChange={(e) => setEraserSize(parseInt(e.target.value))}
+                    value={eraserSize}
+                />
             </div>
 
             <canvas className="bg-white"
                 ref={canvasRef}
                 onMouseDown={onMouseDown}
-                height={canvasHeight}
-                width={canvasWidth}
+                height={windowSize.height}
+                width={windowSize.width}
             />
         </div>
     );
